@@ -1,0 +1,79 @@
+name: Comprobar billetes ALSA
+
+on:
+  schedule:
+    # Cada 15 minutos (GitHub puede retrasar unos minutos las ejecuciones programadas)
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "Qué hacer"
+        type: choice
+        default: comprobar
+        options:
+          - comprobar
+          - prueba-notificaciones
+          - comprobar-sin-avisar
+
+# Nunca dos comprobaciones a la vez
+concurrency:
+  group: alsa-check
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Caché del navegador Playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+
+      - name: Instalar Chromium (solo se usa si ALSA bloquea el modo HTTP)
+        run: python -m playwright install --with-deps chromium
+
+      # Recuerda qué horarios ya se avisaron, para no repetir el aviso cada 15 min
+      - name: Recuperar estado anterior
+        uses: actions/cache/restore@v4
+        with:
+          path: state
+          key: alsa-state-${{ github.run_id }}
+          restore-keys: alsa-state-
+
+      - name: Comprobar disponibilidad
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+        run: |
+          case "${{ github.event.inputs.modo }}" in
+            prueba-notificaciones) python -m bot.main --test-notify ;;
+            comprobar-sin-avisar)  python -m bot.main --dry-run ;;
+            *)                     python -m bot.main ;;
+          esac
+
+      - name: Guardar estado
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: state
+          key: alsa-state-${{ github.run_id }}-${{ github.run_attempt }}

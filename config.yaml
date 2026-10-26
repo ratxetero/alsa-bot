@@ -1,0 +1,57 @@
+# ============================================================
+#  Configuración del bot de disponibilidad ALSA
+#  (aquí NO van contraseñas ni teléfonos: eso va en los Secrets de GitHub)
+# ============================================================
+
+# Número de pasajeros (se buscan plazas para TODOS a la vez)
+pasajeros: 1
+
+# Tipo de pasajero tal y como aparece en la URL de búsqueda de alsa.es.
+# Verificado: "passengerType-4" = Joven (12-25 años).
+# Para otro tipo (Adulto, Senior...), haz la búsqueda en alsa.es y copia
+# el parámetro "passengerType-N" que aparece al final de la URL.
+tipo_pasajero_param: "passengerType-4"
+
+# ------------------------------------------------------------
+# Trayectos a vigilar. Deja "fecha" vacía ("") para desactivar uno.
+# Los IDs de estación salen de la URL de búsqueda de alsa.es
+# (originStationId / destinationStationId). Ver README.
+# horarios: lista de horas exactas ("08:30") o rangos ("15:00-17:30").
+# ------------------------------------------------------------
+trayectos:
+  - nombre: "Ida"
+    origen_nombre: ""
+    origen_id: ""
+    destino_nombre: ""
+    destino_id: ""
+    fecha: ""            # formato DD/MM/AAAA. Vacío = no se vigila
+    horarios: []
+
+  - nombre: "Vuelta"
+    origen_nombre: "Logroño"
+    origen_id: "594"
+    destino_nombre: "Madrid Interc. Av América"
+    destino_id: "5155"
+    fecha: "02/11/2026"
+    horarios:
+      - "15:00-17:30"
+
+# ------------------------------------------------------------
+# Comportamiento
+# ------------------------------------------------------------
+# auto  = intenta HTTP directo y, si falla, usa navegador (Playwright)
+# http  = solo HTTP (más rápido)
+# browser = solo navegador
+modo: "auto"
+
+reintentos: 3                 # intentos por consulta si la web falla
+espera_reintento_seg: 20      # espera base entre intentos (se multiplica)
+pausa_entre_trayectos_seg: 5  # para no saturar a ALSA
+
+# Avisar solo cuando aparezca un horario NUEVO con plazas
+# (evita recibir el mismo aviso cada 15 minutos).
+avisar_solo_cambios: true
+
+notificaciones:
+  email: true
+  whatsapp: true
