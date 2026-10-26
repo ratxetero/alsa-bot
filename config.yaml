@@ -54,4 +54,4 @@ avisar_solo_cambios: true
 
 notificaciones:
   email: true
-  whatsapp: true
+  whatsapp: false
