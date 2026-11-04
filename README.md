@@ -9,7 +9,7 @@ trayectos, fechas y horarios que tú elijas, y te avisa por **email (Gmail)** y 
 | Trayecto | Ruta | Fecha | Horarios | Pasajeros |
 |---|---|---|---|---|
 | Ida | *(vacía, desactivada)* | — | — | — |
-| Vuelta | Logroño → Madrid Interc. Av. América | 02/11/2026 | de 15:00 a 17:30 | 1 (Joven) |
+| Vuelta | Logroño → Madrid Interc. Av. América | 09/11/2026 | 15:00 (normal, no SUPRA), 16:00, 17:30 | 1 (Joven) |
 
 ---
 
@@ -150,6 +150,12 @@ Todo se cambia en `config.yaml` (en GitHub: abre el archivo → icono del lápiz
     - "15:00-17:30"    # cualquier salida entre 15:00 y 17:30, ambas incluidas
   ```
   Con `horarios: []` vale cualquier hora del día.
+- **Excluir un tipo de servicio** (p. ej. el SUPRA, que sale a la misma hora que el normal):
+  ```yaml
+  excluir_servicios:
+    - "Supra"
+  ```
+- El mismo día del viaje sigue comprobando, pero ignora las salidas que ya han pasado.
 - **Pasajeros:** `pasajeros: 2` → solo avisa si hay plazas para los 2.
 - **Activar la ida:** rellena el bloque `Ida` igual que el de la vuelta.
 

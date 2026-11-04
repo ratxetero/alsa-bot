@@ -52,6 +52,7 @@ class Salida:
     disponible: bool
     precio: float | None = None
     estado: str = ""  # valor bruto de canBeSold
+    servicio: str = ""  # p. ej. "Comfort", "Supra" (serviceTypeDescList / lineName)
 
     @property
     def clave(self) -> str:
@@ -99,6 +100,10 @@ def parsear_json(data: dict, fecha_esperada: str) -> list[Salida]:
             except (TypeError, ValueError):
                 pass
         estado = str(j.get("canBeSold", ""))
+        tipos = j.get("serviceTypeDescList") or []
+        servicio = " ".join(
+            x for x in [*(str(t) for t in tipos), str(j.get("lineName") or "")] if x
+        )
         salidas.append(
             Salida(
                 fecha=fecha or fecha_esperada,
@@ -107,6 +112,7 @@ def parsear_json(data: dict, fecha_esperada: str) -> list[Salida]:
                 disponible=(estado == "V"),
                 precio=precio,
                 estado=estado,
+                servicio=servicio,
             )
         )
     return salidas
@@ -190,6 +196,7 @@ def parsear_tarjetas(textos: list[str], fecha: str) -> list[Salida]:
                 disponible=disponible,
                 precio=float(precio.group(1).replace(",", ".")) if precio else None,
                 estado="DOM",
+                servicio="Supra" if "SUPRA" in t.upper() else "",
             )
         )
     return salidas

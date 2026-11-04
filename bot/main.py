@@ -150,13 +150,24 @@ def ejecutar(cfg: Config, ruta_estado: Path, dry_run: bool) -> int:
                 resumen.append(f"- ❌ **{tr.nombre}** {tr.descripcion} {tr.fecha}: error ({e})")
                 continue
 
-            en_franja = [s for s in salidas if tr.hora_valida(s.hora)]
+            en_franja = []
+            for s in salidas:
+                if not tr.hora_valida(s.hora):
+                    continue
+                if tr.servicio_excluido(s.servicio):
+                    log.info("   %s → %s  (%s, excluido por config)", s.hora, s.llegada, s.servicio)
+                    continue
+                # El mismo día del viaje, ignorar salidas que ya han pasado
+                if tr.fecha_dt.date() == ahora.date() and s.hora < ahora.strftime("%H:%M"):
+                    log.info("   %s → %s  (ya ha salido hoy)", s.hora, s.llegada)
+                    continue
+                en_franja.append(s)
             log.info("[%s] %d salidas en total, %d en tus horarios (vía %s)",
                      tr.nombre, len(salidas), len(en_franja), consultor.metodo_usado)
             if not en_franja:
                 log.info("[%s] Ninguna salida de ALSA cae en tus horarios ese día.", tr.nombre)
             for s in en_franja:
-                log.info("   %s → %s  %s%s", s.hora, s.llegada,
+                log.info("   %s → %s  [%s]  %s%s", s.hora, s.llegada, s.servicio or "-",
                          "DISPONIBLE" if s.disponible else "completo",
                          f"  ({s.precio:.2f} €)" if s.precio and s.disponible else "")
 

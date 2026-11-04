@@ -32,9 +32,14 @@ trayectos:
     origen_id: "594"
     destino_nombre: "Madrid Interc. Av América"
     destino_id: "5155"
-    fecha: "02/11/2026"
+    fecha: "09/11/2026"
     horarios:
-      - "15:00-17:30"
+      - "15:00"
+      - "16:00"
+      - "17:30"
+    # Servicios que NO interesan (texto que ALSA muestra en la tarjeta, p. ej. SUPRA)
+    excluir_servicios:
+      - "Supra"
 
 # ------------------------------------------------------------
 # Comportamiento

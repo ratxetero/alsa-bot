@@ -43,6 +43,7 @@ class Trayecto:
     destino_id: str
     fecha: str  # DD/MM/AAAA
     franjas: list[Franja] = field(default_factory=list)
+    excluir_servicios: list[str] = field(default_factory=list)
 
     @property
     def fecha_dt(self) -> datetime:
@@ -51,6 +52,10 @@ class Trayecto:
     def hora_valida(self, hhmm: str) -> bool:
         # Sin horarios = cualquier hora del día
         return not self.franjas or any(f.contiene(hhmm) for f in self.franjas)
+
+    def servicio_excluido(self, servicio: str) -> bool:
+        s = (servicio or "").lower()
+        return any(x.lower() in s for x in self.excluir_servicios if x)
 
     @property
     def descripcion(self) -> str:
@@ -113,6 +118,7 @@ def cargar_config(ruta: str | Path = "config.yaml") -> Config:
             destino_id=str(t.get("destino_id", "")).strip(),
             fecha=fecha,
             franjas=_parse_franjas(t.get("horarios")),
+            excluir_servicios=[str(x).strip() for x in (t.get("excluir_servicios") or [])],
         )
         if not tr.origen_id or not tr.destino_id:
             raise ValueError(f"Trayecto '{tr.nombre}': faltan origen_id/destino_id")

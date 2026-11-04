@@ -5,15 +5,6 @@ on:
     # Cada 15 minutos (GitHub puede retrasar unos minutos las ejecuciones programadas)
     - cron: "*/15 * * * *"
   workflow_dispatch:
-    inputs:
-      modo:
-        description: "Qué hacer"
-        type: choice
-        default: comprobar
-        options:
-          - comprobar
-          - prueba-notificaciones
-          - comprobar-sin-avisar
 
 # Nunca dos comprobaciones a la vez
 concurrency:
@@ -64,12 +55,7 @@ jobs:
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
           CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
           CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
-        run: |
-          case "${{ github.event.inputs.modo }}" in
-            prueba-notificaciones) python -m bot.main --test-notify ;;
-            comprobar-sin-avisar)  python -m bot.main --dry-run ;;
-            *)                     python -m bot.main ;;
-          esac
+        run: python -m bot.main
 
       - name: Guardar estado
         if: always()
@@ -77,5 +63,3 @@ jobs:
         with:
           path: state
           key: alsa-state-${{ github.run_id }}-${{ github.run_attempt }}
-
-# activar
