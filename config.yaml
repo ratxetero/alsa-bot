@@ -24,7 +24,7 @@ trayectos:
     origen_id: ""
     destino_nombre: ""
     destino_id: ""
-    fecha: "08/12/2026"             # formato DD/MM/AAAA. Vacío = no se vigila
+    fecha: ""            # formato DD/MM/AAAA. Vacío = no se vigila
     horarios: []
 
   - nombre: "Vuelta"
@@ -32,7 +32,7 @@ trayectos:
     origen_id: "594"
     destino_nombre: "Madrid Interc. Av América"
     destino_id: "5155"
-    fecha: "09/11/2026"
+    fecha: "08/12/2026"
     horarios:
       - "15:00"
       - "16:00"
