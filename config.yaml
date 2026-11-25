@@ -24,7 +24,7 @@ trayectos:
     origen_id: ""
     destino_nombre: ""
     destino_id: ""
-    fecha: ""            # formato DD/MM/AAAA. Vacío = no se vigila
+    fecha: "08/12/2026"             # formato DD/MM/AAAA. Vacío = no se vigila
     horarios: []
 
   - nombre: "Vuelta"
